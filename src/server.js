@@ -6,6 +6,7 @@ import listEndpoints from "express-list-endpoints";
 //routes for the api
 import productRouter from "./services/products/index.js";
 import userRoutes from "./services/users/index.js";
+import reviewsRoutes from "./services/reviews/reviews.js";
 
 
 const server = express();
@@ -18,6 +19,7 @@ server.use(express.json());
 //routes
 server.use("/product", productRouter);
 server.use("/users", userRoutes);
+server.use("/reviews", reviewsRoutes);
 
 
 mongoose.connect(process.env.MONGO_URL);

@@ -18,24 +18,7 @@ const UserModel = new Schema({
     email: {
         type: String,
         required: true
-    },
-    reviews: [{
-            type: new Schema({
-                comment: {
-                    type: String,
-                    required: true
-                }, 
-                rate: {
-                    type: Number,
-                    required: true
-                },
-                productId: {
-                    type: String,
-                    required: true
-                }
-            }) 
-        }
-    ]
+    }
 }, {
     timestamps : true
 });

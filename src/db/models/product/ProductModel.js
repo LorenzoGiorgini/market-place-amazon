@@ -24,7 +24,7 @@ const productSchema = new Schema(
     imageUrl: { type: String, required: true },
     price: { type: Number, required: true },
     category: [{ type: String, required: true, enum: ["Smartphone", "Television" , "Headphones"]}],
-    reviews: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   },
   {
     timestamps: true,

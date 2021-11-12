@@ -1,13 +1,30 @@
 import express from "express";
 import createHttpError from "http-errors";
 import ProductModel from "../../db/models/product/ProductModel.js";
+import ReviewModel from "../../db/models/reviews/ReviewsModel.js";
+
+/**
+ *   reivews as seperate schema for
+ *     reviews has createdBy --> ref user id
+ *
+ *    /product/:id/reviews POST
+ *           create review for product
+ *             push only the review id to products.reviews array
+ *            await Products.find([]).populate({path:"reviews",populate:{path:"createdBy","select":"firstNAme, lastNAme"}})
+ *
+ *
+ *
+ */
 
 const productRouter = express.Router();
 
 //Gets all products
 productRouter.get("/", async (req, res, next) => {
   try {
-    const products = await ProductModel.find().populate({path: "reviews"});
+    const products = await ProductModel.find().populate({
+      path: "reviews",
+      populate: { path: "createdBy" },
+    });
     res.send(products);
   } catch (error) {
     next(error);
