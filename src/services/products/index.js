@@ -7,7 +7,7 @@ const productRouter = express.Router();
 //Gets all products
 productRouter.get("/", async (req, res, next) => {
   try {
-    const products = await productModel.find();
+    const products = await ProductModel.find().populate({path: "reviews"});
     res.send(products);
   } catch (error) {
     next(error);

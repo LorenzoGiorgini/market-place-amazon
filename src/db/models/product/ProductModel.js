@@ -23,8 +23,8 @@ const productSchema = new Schema(
     brand: { type: String, required: true },
     imageUrl: { type: String, required: true },
     price: { type: Number, required: true },
-    category: { type: String, required: true },
-    review: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+    category: [{ type: String, required: true, enum: ["Smartphone", "Television" , "Headphones"]}],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,

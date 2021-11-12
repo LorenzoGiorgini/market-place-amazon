@@ -1,5 +1,6 @@
 import express from "express";
 import UserModel from "../../db/models/users/UsersModel.js";
+import ProductModel from "../../db/models/product/ProductModel.js"
 
 const { Router } = express;
 
@@ -13,7 +14,7 @@ router
     try {
       const createUser = new UserModel(req.body);
 
-      const {_id} = await review.save();
+      const {_id} = await createUser.save();
 
       res.status(201).send({success: true, data: _id});
 
@@ -110,21 +111,24 @@ router
 
   //REVIEW ENDPOINTS
   router
-  .route("/:userId/review")
+  .route("/:userId/review/:productId")
   .post(async (req, res, next) => {
     try {
       const id = req.params.userId
       const user = await UserModel.findById(id,  { _id: 0 })
       //this grabs the specific user that has the reviews document nested inside
   
-      const newReviw = req.body
+      const newReview = req.body
       //the data for the Review is in the req body
   
       if (user) {
-        const addReviw = await UserModel.findByIdAndUpdate(id, { $push: { review: newReview}   }, {new: true} )
-        res.send(addReview)
-  
-  
+        const addReview = await UserModel.findByIdAndUpdate(id, { $push: { reviews: newReview}   }, {new: true})
+
+        const lengthOfAddReview = addReview.reviews.length - 1
+
+        const product = await ProductModel.findByIdAndUpdate(req.params.productId, { $push: { reviews: addReview.reviews[lengthOfAddReview]._id}   }, {new: true} )
+
+        res.status(201).send(addReview)
       } else {
         next(createHttpError(404, `User with the ID: ${req.params.userId} not found!`))
       }
