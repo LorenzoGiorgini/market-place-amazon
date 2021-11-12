@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import listEndpoints from "express-list-endpoints";
 
 //routes for the api
-import reviewsRoutes from "./services/reviews/reviews.js";
+import userRoutes from "./services/users/users.js"
 
 
 const server = express();
@@ -19,7 +19,7 @@ server.use(express.json());
 
 //routes
 
-server.use("/reviews", reviewsRoutes);
+server.use("/users", userRoutes);
 
 
 
