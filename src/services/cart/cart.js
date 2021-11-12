@@ -9,20 +9,17 @@ const router = Router();
 
 router.route("/:userId/addToCart").post(async (req, res) => {
   try {
-
-    const { productId , quantity } = req.body;
+    const { productId, quantity } = req.body;
 
     const purchasedProduct = await ProductModel.findById(productId);
 
-    console.log(purchasedProduct)
-
-    
+    console.log(purchasedProduct);
 
     if (purchasedProduct) {
       const productAlreadyInCart = await CartModel.findOne({
         ownerId: req.params.userId,
         status: "active",
-        "products.id": purchasedProduct._id,
+        "products._id": purchasedProduct._id,
       });
 
       if (productAlreadyInCart) {
@@ -30,7 +27,7 @@ router.route("/:userId/addToCart").post(async (req, res) => {
           {
             ownerId: req.params.userId,
             status: "active",
-            "products.id": purchasedProduct._id,
+            "products._id": purchasedProduct._id,
           },
           {
             $inc: { "products.$.quantity": quantity },
@@ -64,8 +61,7 @@ router.route("/:userId/addToCart").post(async (req, res) => {
   }
 });
 
-
-//gets cart by user id 
+//gets cart by user id
 router.route("/:userId").get(async (req, res) => {
   try {
     const id = req.params.userId;
