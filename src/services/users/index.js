@@ -107,4 +107,48 @@ router
   });
 
 
+
+  //REVIEW ENDPOINTS
+  router
+  .route("/:userId/review")
+  .post(async (req, res, next) => {
+    try {
+      const id = req.params.userId
+      const user = await UserModel.findById(id,  { _id: 0 })
+      //this grabs the specific user that has the reviews document nested inside
+  
+      const newReviw = req.body
+      //the data for the Review is in the req body
+  
+      if (user) {
+        const addReviw = await UserModel.findByIdAndUpdate(id, { $push: { review: newReview}   }, {new: true} )
+        res.send(addReview)
+  
+  
+      } else {
+        next(createHttpError(404, `User with the ID: ${req.params.userId} not found!`))
+      }
+  
+    } catch (error) {
+      next(error)
+    }
+  })
+
+
+  //GET ALL REVIEWS
+  .get(async (req, res, next) => {
+  try {
+    const id = req.params.userId
+
+    const user = await UserModel.findById(id)
+    if (user) {
+      res.send(user.reviews)
+    } else {
+      next(createHttpError(404, `User with the ID:  ${id} not found!`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default router
