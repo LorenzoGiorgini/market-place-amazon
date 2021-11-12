@@ -3,6 +3,19 @@ import createHttpError from "http-errors";
 import ProductModel from "../../db/models/product/ProductModel.js";
 import ReviewModel from "../../db/models/reviews/ReviewsModel.js";
 
+import q2m from "query-to-mongo";
+
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
+
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "Products-Images",
+  },
+});
+
 /**
  *   reivews as seperate schema for
  *     reviews has createdBy --> ref user id
@@ -21,11 +34,25 @@ const productRouter = express.Router();
 //Gets all products
 productRouter.get("/", async (req, res, next) => {
   try {
-    const products = await ProductModel.find().populate({
-      path: "reviews",
-      populate: { path: "createdBy" },
+    const query = q2m(req.query);
+
+    const total = await ProductModel.countDocuments(query.criteria);
+
+    const products = await ProductModel.find(query.criteria)
+      .populate({
+        path: "reviews",
+        populate: { path: "createdBy", select: "name surname" },
+      })
+      .limit(query.options.limit)
+      .skip(query.options.skip)
+      .sort(query.criteria.category);
+
+    res.send({
+      totalPages: Math.ceil(total / query.options.limit),
+      links: query.links("/products", total),
+      products: products,
+      totalProducts: total,
     });
-    res.send(products);
   } catch (error) {
     next(error);
   }
@@ -42,15 +69,34 @@ productRouter.post("/", async (req, res, next) => {
   }
 });
 
+//Creates a new Product
+productRouter.put(
+  "/:productId/uploadImage",
+  multer({ storage: cloudinaryStorage }).single("imageUrl"),
+  async (req, res, next) => {
+    try {
+      const newProduct = await ProductModel.findByIdAndUpdate(
+        req.params.productId,
+        { ...req.body, imageUrl: req.file.path },
+        { new: true }
+      );
+
+      const { _id } = await newProduct.save();
+
+      res.status(201).send({ _id });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 //Delete a product
 productRouter.delete("/:productId", async (req, res, next) => {
   try {
     const { id } = req.params.productId;
     const product = await ProductModel.findByIdAndDelete(id);
-    if (!product) {
-      throw createHttpError(404, `Product with ID: ${id} is deleted`);
-    }
-    res.send(product);
+
+    res.status(204).send({ success: true, message: "Product deleted" });
   } catch (error) {
     next(error);
   }
@@ -64,6 +110,25 @@ productRouter.get("/:productId", async (req, res, next) => {
     const product = await ProductModel.findById(id);
     if (product) {
       res.send(product);
+    } else {
+      next(createHttpError(404, `product with the ID:  ${id} not found!`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+//gets all the reviews from a specific product
+productRouter.get("/:productId/reviews", async (req, res, next) => {
+  try {
+    const id = req.params.productId;
+
+    const product = await ProductModel.findById(id).populate({
+      path: "reviews",
+      populate: { path: "createdBy", select: "name surname" },
+    });
+    if (product) {
+      res.send(product.reviews);
     } else {
       next(createHttpError(404, `product with the ID:  ${id} not found!`));
     }

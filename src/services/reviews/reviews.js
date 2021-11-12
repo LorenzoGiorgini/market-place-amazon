@@ -8,7 +8,7 @@ const reviewRouter = Router();
 
 reviewRouter.get("/", async (req, res, next) => {
   try {
-    const reviews = await ReviewModel.find().populate({ path: "reviews" });
+    const reviews = await ReviewModel.find().populate({ path: "createdBy" });
     res.send(reviews);
   } catch (error) {
     next(error);
@@ -34,11 +34,13 @@ reviewRouter.post("/:productId", async (req, res, next) => {
   }
 });
 
+
+//TODO: delete from the 
 reviewRouter.delete("/:reviewId", async (req, res, next) => {
   try {
-    const { id } = req.params.reviewId;
-    const review = await ReviewModel.findByIdAndDelete(id);
-    res.status(201).send(review);
+    const id = req.params.reviewId;
+    const deleteReview = await ReviewModel.findByIdAndDelete(id);
+    res.status(201).send(deleteReview);
   } catch (error) {
     next(error);
   }

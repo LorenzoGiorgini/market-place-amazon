@@ -7,6 +7,7 @@ import listEndpoints from "express-list-endpoints";
 import productRouter from "./services/products/index.js";
 import userRoutes from "./services/users/index.js";
 import reviewsRoutes from "./services/reviews/reviews.js";
+import cartRoutes from "./services/cart/cart.js"
 
 
 const server = express();
@@ -20,6 +21,7 @@ server.use(express.json());
 server.use("/product", productRouter);
 server.use("/users", userRoutes);
 server.use("/reviews", reviewsRoutes);
+server.use("/cart", cartRoutes);
 
 
 mongoose.connect(process.env.MONGO_URL);
