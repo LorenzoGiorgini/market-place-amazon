@@ -4,8 +4,8 @@ import listEndpoints from "express-list-endpoints";
 
 
 //routes for the api
-import productRouter from "./db/models/product/index.js";
-import userRoutes from "./services/users/users.js"
+import productRouter from "./services/products/index.js";
+import userRoutes from "./services/users/index.js";
 
 
 const server = express();

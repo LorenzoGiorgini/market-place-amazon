@@ -1,6 +1,6 @@
 import express from "express";
 import createHttpError from "http-errors";
-import ProductModel from "./ProductModel.js";
+import ProductModel from "../../db/models/product/ProductModel.js";
 
 const productRouter = express.Router();
 
